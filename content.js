@@ -1,47 +1,24 @@
-function addDownloadButton() {
-  const container = document.querySelector("body"); // Butonu ekleyeceğimiz genel bir konteyner
-  if (!container) return;
+function scrapeTrendyolCoupons() {
+  let coupons = [];
 
-  const button = document.createElement("button");
-  button.innerText = "İndir";
-  button.className = "download-button";
-  button.style.position = "fixed";
-  button.style.bottom = "20px";
-  button.style.right = "20px";
-  button.style.zIndex = "10000";
-  button.style.backgroundColor = "#e74c3c";
-  button.style.color = "white";
-  button.style.padding = "10px 15px";
-  button.style.border = "none";
-  button.style.cursor = "pointer";
-  button.style.fontSize = "16px";
-  
-  button.onclick = () => {
-    const video = document.querySelector("video");
+  // `product-badge coupon-discount` sınıfına sahip öğeleri buluyoruz
+  document.querySelectorAll(".product-badge.coupon-discount .name").forEach((el) => {
+    const couponText = el.textContent.trim();
+    const couponValue = parseInt(couponText.replace("TL Kupon", "").trim());
 
-    if (!video || !video.src) {
-      alert("Video bulunamadı veya indirilemedi!");
-      return;
+    if (!isNaN(couponValue)) {
+      coupons.push({
+        text: couponText,
+        value: couponValue
+      });
     }
+  });
 
-    const videoURL = video.src;
-    if (!videoURL || !/^https?:\/\//.test(videoURL)) {
-      alert("Geçersiz video URL'si!");
-      return;
-    }
+  // Kuponları büyükten küçüğe doğru sıralıyoruz
+  coupons.sort((a, b) => b.value - a.value);
 
-    chrome.runtime.sendMessage({ url: videoURL });
-  };
-
-  // Eğer buton eklenmemişse ekliyoruz
-  if (!document.querySelector(".download-button")) {
-    container.appendChild(button);
-  }
+  // Kuponları popup'a gönderiyoruz
+  chrome.runtime.sendMessage({ action: "showCoupons", coupons: coupons });
 }
 
-// DOM değişikliklerini izlemek için MutationObserver kullanımı
-const observer = new MutationObserver(addDownloadButton);
-observer.observe(document.body, { childList: true, subtree: true });
-
-// İlk olarak butonları ekle
-addDownloadButton();
+scrapeTrendyolCoupons();

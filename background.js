@@ -1,13 +1,17 @@
-chrome.runtime.onMessage.addListener((request) => {
-    if (request.url) {
-      chrome.downloads.download({ url: request.url }, (downloadId) => {
-        if (chrome.runtime.lastError) {
-          alert("İndirme başarısız! Bağlantı panoya kopyalanacak.");
-          navigator.clipboard.writeText(request.url).then(() => {
-            alert("Video bağlantısı panoya kopyalandı. Manuel olarak indirebilirsiniz.");
-          });
-        }
+chrome.runtime.onInstalled.addListener(() => {
+    console.log("Test Kupon Scraper yüklendi!");
+  });
+  
+  chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+    if (changeInfo.status === "complete" && tab.url) {
+      chrome.scripting.executeScript({
+        target: { tabId: tabId },
+        function: scrapeCoupons
       });
     }
   });
+  
+  function scrapeCoupons() {
+    console.log("Kupon verileri toplanıyor...");
+  }
   

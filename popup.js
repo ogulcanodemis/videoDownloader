@@ -1,37 +1,17 @@
-document.getElementById("downloadButton").addEventListener("click", function () {
-    const resolution = document.getElementById("resolution").value;
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      chrome.scripting.executeScript({
-        target: { tabId: tabs[0].id },
-        func: downloadVideo,
-        args: [resolution]
+chrome.runtime.onMessage.addListener((request) => {
+    if (request.action === "showCoupons" && request.coupons) {
+      const couponsDiv = document.getElementById("coupons");
+      couponsDiv.innerHTML = "";
+  
+      request.coupons.forEach(coupon => {
+        const couponElement = document.createElement("div");
+        couponElement.innerHTML = `
+          <p><strong>Kupon:</strong> ${coupon.text}</p>
+          <p><strong>Değer:</strong> ${coupon.value} TL</p>
+          <hr>
+        `;
+        couponsDiv.appendChild(couponElement);
       });
-    });
+    }
   });
-  
-  function downloadVideo(resolution) {
-    const video = document.querySelector("video");
-  
-    if (!video || !video.src) {
-      alert("Video bulunamadı veya indirilemedi!");
-      return;
-    }
-  
-    let videoURL = video.src;
-  
-    if (resolution === "720p") {
-      videoURL = video.src.replace("1080p", "720p");
-    } else if (resolution === "480p") {
-      videoURL = video.src.replace("1080p", "480p");
-    } else if (resolution === "360p") {
-      videoURL = video.src.replace("1080p", "360p");
-    }
-  
-    if (!videoURL || !/^https?:\/\//.test(videoURL)) {
-      alert("Geçersiz video URL'si!");
-      return;
-    }
-    
-    chrome.runtime.sendMessage({ url: videoURL });
-  }
   
