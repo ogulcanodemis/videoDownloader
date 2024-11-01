@@ -1,0 +1,21 @@
+{
+    "manifest_version": 3,
+    "name": "Gelişmiş Video İndirici",
+    "version": "1.1",
+    "description": "Videoların sağ üst köşesinde 'indir' düğmesi çıkararak farklı çözünürlüklerde video indirmenizi sağlar.",
+    "permissions": ["activeTab", "downloads", "scripting", "clipboardWrite"],
+    "action": {
+      "default_popup": "popup.html"
+    },
+    "content_scripts": [
+      {
+        "matches": ["*://*.x.com/*", "*://*.instagram.com/*", "*://*.youtube.com/*"],
+        "js": ["content.js"],
+        "css": ["content.css"]
+      }
+    ],
+    "background": {
+      "service_worker": "background.js"
+    }
+  }
+  
